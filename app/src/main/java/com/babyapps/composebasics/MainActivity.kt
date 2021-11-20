@@ -1,6 +1,7 @@
 package com.babyapps.composebasics
 
 import android.os.Bundle
+import android.text.style.StrikethroughSpan
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -21,7 +22,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,73 +40,53 @@ import com.babyapps.composebasics.ui.theme.ComposeBasicsTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val fontFamily = FontFamily(
+            Font(R.font.ubuntu_medium, FontWeight.Thin),
+            Font(R.font.ubuntu_bold, FontWeight.Bold),
+            Font(R.font.ubuntu_medium, FontWeight.Medium),
+        )
+
         setContent {
-            val painter = painterResource(id = R.drawable.recess)
-            val contentDescription = "Recess"
-            val title = "Disney' s Recess"
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .padding(15.dp)
+                    .fillMaxSize()
+                    .background(Color(0xFF101010))
             ) {
-                ImageCard(painter = painter, contentDescription = contentDescription, title = title)
+                Text(
+                    //text = "Jetpack Compose",
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                color = Color.Green,
+                                fontSize = 50.sp
+                            )
+                        ) {
+                            append("J")
+                        }
+                        append("etpack ")
+                        withStyle(
+                            style = SpanStyle(
+                                color = Color.Green,
+                                fontSize = 50.sp
+                            )
+                        ) {
+                            append(" C")
+                        }
+                        append("ompose")
+                    },
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    textAlign = TextAlign.Center,
+                    textDecoration = TextDecoration.Underline
+                )
             }
 
 
         }
     }
 }
-
-@Composable
-fun ImageCard(
-    painter: Painter,
-    contentDescription: String,
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),// Köşeleri yuvarla
-        elevation = 5.dp  //Gölgeyi ayarla
-    ) {
-        Box(modifier = Modifier.height(300.dp)) {
-            //Sıralama : önce resim, sonra gradient, en son yazı
-            Image(
-                painter = painter,
-                contentDescription = contentDescription,
-                contentScale = ContentScale.Crop
-            )
-
-            //Gradient
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black
-                            ),
-                            startY = 400f
-                        )
-                    )
-            )
-
-
-            //Text - Title
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(10.dp),
-                contentAlignment = Alignment.BottomStart,
-            ) {
-                Text(text = title, style = TextStyle(color = Color.White, fontSize = 15.sp))
-            }
-
-
-        }
-    }
-
-}
-
