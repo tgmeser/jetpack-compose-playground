@@ -11,13 +11,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.babyapps.composebasics.ui.theme.ComposeBasicsTheme
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -46,59 +44,59 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Column(Modifier.fillMaxSize()) {
-                val color = remember {
-                    mutableStateOf(Color.Yellow)
-                }
-
-                ColorBox(
-                    Modifier
-                        .weight(1f)
-                        .fillMaxSize()
-                ){
-                    //Bu Lambda bloğu 2.parametredir yani alttaki ColorBox metodundaki updateColor kısmı
-                    color.value=it
-                    //tıkladıkça random olarak gelen yeni renk değeri (it), color state' ine veriliyor
-                }
-
-
-                //Alttaki kutunun rengini yukardaki "color" statinden aldı
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(color.value) //color.value yukarda color.value=it satırında alınan değerden gelir
-                        .fillMaxSize()
-                )
+            val scaffoldState = rememberScaffoldState()
+            var textFieldState by remember {
+                // delegasyon ile (by) bu state direkt olarak string oldu, .value gösterimine gerek yok
+                mutableStateOf("")
             }
 
+            val scope = rememberCoroutineScope()
+
+            //scaffold : jetpack compose elemanları gösterebildiğimiz bir layout çeşidi
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                scaffoldState = scaffoldState
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 30.dp)
+                ) {
+
+                    TextField(
+                        value = textFieldState,
+                        label = {
+                            Text(text = "Type here...")
+                        },
+                        onValueChange = {
+                            textFieldState = it
+                        },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Button(onClick = {
+                        // Buttona basınca Snackbar göster
+                        // showSnackbar fonksiyonu coroutine içinde çalışmalı
+                        // bu örnekte yaptık ama coroutine, composable fonk içinde direkt çağırılmamalı
+                        scope.launch {
+                            scaffoldState.snackbarHostState.showSnackbar("You typed : $textFieldState")
+                        }
+
+
+                    }) {
+                        Text("Click Here")
+                    }
+                }
+
+            }
 
         }
     }
 }
 
-@Composable
-fun ColorBox(modifier: Modifier = Modifier, updateColor: (Color) -> Unit) {
 
-    /*
-    val color = remember {
-        //remember : Her ColorBox metodu çalıştığında tekrar tekrar Sarı rengi kurma, Sarı Rengi HATIRLA!
-        mutableStateOf(Color.Yellow)
-    }
-
-     */
-
-    Box(modifier = modifier
-        .background(Color.Red)
-        .clickable {
-            updateColor(
-                Color(
-                    Random.nextFloat(),
-                    Random.nextFloat(),
-                    Random.nextFloat(),
-                    1f
-                )
-            )
-        }) {
-
-    }
-}
