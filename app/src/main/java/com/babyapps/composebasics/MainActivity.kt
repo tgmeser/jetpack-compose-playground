@@ -5,11 +5,10 @@ import android.os.Bundle
 import android.text.style.StrikethroughSpan
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -44,57 +43,64 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val scaffoldState = rememberScaffoldState()
-            var textFieldState by remember {
-                // delegasyon ile (by) bu state direkt olarak string oldu, .value gösterimine gerek yok
-                mutableStateOf("")
-            }
 
-            val scope = rememberCoroutineScope()
-
-            //scaffold : jetpack compose elemanları gösterebildiğimiz bir layout çeşidi
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                scaffoldState = scaffoldState
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 30.dp)
-                ) {
-
-                    TextField(
-                        value = textFieldState,
-                        label = {
-                            Text(text = "Type here...")
-                        },
-                        onValueChange = {
-                            textFieldState = it
-                        },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+            //LazyColumn kullanımı - 1
+/*
+            LazyColumn {
+                items(30) {
+                    Text(
+                        text = "Item $it",
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
                     )
-
-                    Spacer(modifier = Modifier.height(15.dp))
-
-                    Button(onClick = {
-                        // Buttona basınca Snackbar göster
-                        // showSnackbar fonksiyonu coroutine içinde çalışmalı
-                        // bu örnekte yaptık ama coroutine, composable fonk içinde direkt çağırılmamalı
-                        scope.launch {
-                            scaffoldState.snackbarHostState.showSnackbar("You typed : $textFieldState")
-                        }
-
-
-                    }) {
-                        Text("Click Here")
-                    }
                 }
 
             }
 
+ */
+
+            //LazyColumn kullanımı - 2
+
+            LazyColumn {
+                itemsIndexed(listOf("This", "is", "Jetpack", "Compose", "App")) { index, string ->
+                    Text(
+                        text = string,
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                    )
+
+                }
+
+
+            }
+
+            /*
+            // Normal Column ile Scrollable Liste gösterimi
+            val scrollState = rememberScrollState()
+
+            //vertricalscroll state istiyor
+            Column (modifier = Modifier.verticalScroll(scrollState)){
+                for (i in 1..20) {
+                    Text(
+                        text = "Item $i",
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                    )
+                }
+            }
+             */
         }
     }
 }
