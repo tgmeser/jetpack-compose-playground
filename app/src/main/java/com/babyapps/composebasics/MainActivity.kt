@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.text.style.StrikethroughSpan
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,6 +42,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import com.babyapps.composebasics.ui.theme.ComposeBasicsTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -48,47 +51,64 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-
-            val constraints = ConstraintSet {
-                val greenBox = createRefFor("greenbox")
-                val redBox = createRefFor("redbox")
-
-                constrain(greenBox) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    width = Dimension.value(100.dp)
-                    height = Dimension.value(100.dp)
-                }
-
-                constrain(redBox) {
-                    top.linkTo(parent.top)
-                    start.linkTo(greenBox.end)
-                    end.linkTo(parent.end)
-                    //width= Dimension.fillToConstraints
-                    width = Dimension.value(100.dp)
-                    height = Dimension.value(100.dp)
-                }
-                createHorizontalChain(
-                    greenBox, redBox,
-                    chainStyle = ChainStyle.Packed
-                )
-
+            var sizeState by remember {
+                mutableStateOf(200.dp)
             }
+            //Dp ler büyüyeceği için animateDpAsState seçildi
+            val size by animateDpAsState(
+                targetValue = sizeState,
+                tween(durationMillis = 1000)
 
-            ConstraintLayout(constraints, modifier = Modifier.fillMaxSize()) {
 
-                Box(
-                    modifier = Modifier
-                        .background(Color.Green)
-                        .layoutId("greenbox")
+                /*
+                keyframes {
+                    durationMillis = 5000
+                    sizeState at 0 with LinearEasing
+                    sizeState * 1.5f at 1000 with FastOutLinearInEasing
+                    sizeState * 2f at 5000
+                }
+
+                 */
+
+                /*
+                spring(
+                    Spring.DampingRatioHighBouncy,
+
                 )
-                Box(
-                    modifier = Modifier
-                        .background(Color.Red)
-                        .layoutId("redbox")
+
+                 */
+
+                /*
+                tween(
+                    durationMillis = 3000,
+                    delayMillis = 300,//300 ms sonra harekete geçiyor
+                    easing = LinearOutSlowInEasing
                 )
 
+                 */
+            )
 
+            val infiniteTransition = rememberInfiniteTransition()
+
+            val color by infiniteTransition.animateColor(
+                initialValue = Color.Red,
+                targetValue = Color.Green,
+                animationSpec = infiniteRepeatable(
+                    tween(durationMillis = 2000),repeatMode = RepeatMode.Reverse
+                )
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(size)
+                    .background(color = color),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(onClick = {
+                    sizeState += 50.dp
+                }) {
+                    Text(text = "Increase Size")
+                }
             }
 
         }
