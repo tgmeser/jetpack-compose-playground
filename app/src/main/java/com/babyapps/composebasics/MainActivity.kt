@@ -1,5 +1,6 @@
 package com.babyapps.composebasics
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.style.StrikethroughSpan
 import androidx.activity.ComponentActivity
@@ -15,6 +16,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -36,57 +39,66 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.babyapps.composebasics.ui.theme.ComposeBasicsTheme
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val fontFamily = FontFamily(
-            Font(R.font.ubuntu_medium, FontWeight.Thin),
-            Font(R.font.ubuntu_bold, FontWeight.Bold),
-            Font(R.font.ubuntu_medium, FontWeight.Medium),
-        )
-
         setContent {
+            Column(Modifier.fillMaxSize()) {
+                val color = remember {
+                    mutableStateOf(Color.Yellow)
+                }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFF101010))
-            ) {
-                Text(
-                    //text = "Jetpack Compose",
-                    text = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                color = Color.Green,
-                                fontSize = 50.sp
-                            )
-                        ) {
-                            append("J")
-                        }
-                        append("etpack ")
-                        withStyle(
-                            style = SpanStyle(
-                                color = Color.Green,
-                                fontSize = 50.sp
-                            )
-                        ) {
-                            append(" C")
-                        }
-                        append("ompose")
-                    },
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontStyle = FontStyle.Italic,
-                    textAlign = TextAlign.Center,
-                    textDecoration = TextDecoration.Underline
+                ColorBox(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                ){
+                    //Bu Lambda bloğu 2.parametredir yani alttaki ColorBox metodundaki updateColor kısmı
+                    color.value=it
+                    //tıkladıkça random olarak gelen yeni renk değeri (it), color state' ine veriliyor
+                }
+
+
+                //Alttaki kutunun rengini yukardaki "color" statinden aldı
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(color.value) //color.value yukarda color.value=it satırında alınan değerden gelir
+                        .fillMaxSize()
                 )
             }
 
 
         }
+    }
+}
+
+@Composable
+fun ColorBox(modifier: Modifier = Modifier, updateColor: (Color) -> Unit) {
+
+    /*
+    val color = remember {
+        //remember : Her ColorBox metodu çalıştığında tekrar tekrar Sarı rengi kurma, Sarı Rengi HATIRLA!
+        mutableStateOf(Color.Yellow)
+    }
+
+     */
+
+    Box(modifier = modifier
+        .background(Color.Red)
+        .clickable {
+            updateColor(
+                Color(
+                    Random.nextFloat(),
+                    Random.nextFloat(),
+                    Random.nextFloat(),
+                    1f
+                )
+            )
+        }) {
+
     }
 }
